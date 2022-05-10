@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kafka.learnKafka.model.KafkaModel;
+import com.kafka.learnKafka.repository.KafkaRepo;
 
 
 @RestController
@@ -20,17 +21,22 @@ public class UserResource {
 	KafkaTemplate <String, KafkaModel> kafka;
 	
 	@Autowired
-	public KafkaModel kafkaModel; 
+	public KafkaRepo kafkaRepository; 
 	
 	public static final String TOPIC = "kafka-topic-1";
 	
+	
 	@PostMapping("/kafka/v1/message")
-	public ResponseEntity<Object> dataPost(@RequestBody String message) {
+	public ResponseEntity<Object> dataPost(@RequestBody KafkaModel message) {
 		
 		KafkaModel sendMessage = new KafkaModel();
-		sendMessage.setMessage(message);
+		sendMessage.setMessage(message.toString());
+		this.kafkaRepository.save(message);
+
+		KafkaModel getData = this.kafkaRepository.findByMessage(message.getMessage());
 		
-		kafka.send(TOPIC, sendMessage);
+		kafka.send(TOPIC, getData);
+		System.out.println("Isi nya = " + getData);
 		
 		return new ResponseEntity<Object>("Publish Successfully...", HttpStatus.OK);
 	}

@@ -18,14 +18,16 @@
 		function sendMessage() {
 
 			
-			var input_message = $("#pesan").val()
+			var inputMessage = {
+				"message": $("#pesan").val(),
+			};
 			
 
 			$.ajax({
 				url: '/api/kafka/v1/message',
 				type: 'POST',
 				contentType: 'application/json',
-				data: input_message,
+				data: JSON.stringify(inputMessage),
 				success: (data) => {
 					console.log(data);
 					alert(data);
